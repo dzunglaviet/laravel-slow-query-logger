@@ -58,7 +58,8 @@ class LaravelSlowQueryLoggerProvider extends ServiceProvider
 			$level = config('slow-query-logger.log-level', 'debug');
 			try {
 				foreach ($bindings as $val) {
-					$sql = preg_replace('/\?/', "'{$val}'", $sql, 1);
+					$str = is_scalar($var) ? $var : $var->toString();
+					$sql = preg_replace('/\?/', "'{$str}'", $sql, 1);
 				}
 
 				Log::channel('single')->log($level, $time . '  ' . $sql);
