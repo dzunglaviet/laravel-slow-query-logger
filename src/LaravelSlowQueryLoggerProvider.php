@@ -47,7 +47,7 @@ class LaravelSlowQueryLoggerProvider extends ServiceProvider
 
 		DB::listen(function (QueryExecuted $queryExecuted) {
 			$sql = $queryExecuted->sql;
-			$bindings = $queryExecuted->bindings;
+			$bindings = var_export($queryExecuted->bindings, true);
 			$time = $queryExecuted->time;
 
 			$logSqlQueriesSlowerThan = (float)config('slow-query-logger.time-to-log', -1);
@@ -57,12 +57,7 @@ class LaravelSlowQueryLoggerProvider extends ServiceProvider
 
 			$level = config('slow-query-logger.log-level', 'debug');
 			try {
-				foreach ($bindings as $val) {
-					$str = is_scalar($var) ? $var : $var->toString();
-					$sql = preg_replace('/\?/', "'{$str}'", $sql, 1);
-				}
-
-				Log::channel('single')->log($level, $time . '  ' . $sql);
+				Log::channel('single')->log($level, "$time $sql bindings:$bindings");
 			} catch (Exception $e) {
 				//  be quiet on error
 			}
